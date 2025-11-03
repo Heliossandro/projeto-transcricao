@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Tradutor de Voz em Tempo Real 🎙️</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Tradutor de Voz em Tempo Real</h1>
+        <p>Fala no microfone e vê a tradução ao vivo!</p>
+
+        <div class="select-boxes">
+            <div>
+                <label for="sourceLang">Idioma de origem:</label>
+                <select id="sourceLang">
+                    <option value="pt-PT">Português</option>
+                    <option value="en">Inglês</option>
+                    <option value="es">Espanhol</option>
+                    <option value="fr">Francês</option>
+                    <option value="de">Alemão</option>
+                </select>
+            </div>
+            <div>
+                <label for="targetLang">Idioma de destino:</label>
+                <select id="targetLang">
+                    <option value="en">Inglês</option>
+                    <option value="pt">Português</option>
+                    <option value="es">Espanhol</option>
+                    <option value="fr">Francês</option>
+                    <option value="de">Alemão</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button id="startBtn">Iniciar Gravação</button>
+            <button id="stopBtn" disabled>Parar</button>
+        </div>
+
+        <div class="output">
+            <h3>Original:</h3>
+            <p id="originalText">—</p>
+
+            <h3>Tradução:</h3>
+            <p id="translatedText">—</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+ 
