@@ -1,53 +1,149 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Tradutor de Voz em Tempo Real 🎙️</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Transcrição de Voz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #recordBtn {
+            padding: 20px 40px;
+            font-size: 1.5em;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px;
+        }
+        
+        .recording {
+            background: #ff4444 !important;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .text-box {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 100px;
+            text-align: left;
+            background: #f9f9f9;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Tradutor de Voz em Tempo Real</h1>
-        <p>Fala no microfone e vê a tradução ao vivo!</p>
-
-        <div class="select-boxes">
-            <div>
-                <label for="sourceLang">Idioma de origem:</label>
-                <select id="sourceLang">
-                    <option value="pt-PT">Português</option>
-                    <option value="en">Inglês</option>
-                    <option value="es">Espanhol</option>
-                    <option value="fr">Francês</option>
-                    <option value="de">Alemão</option>
-                </select>
-            </div>
-            <div>
-                <label for="targetLang">Idioma de destino:</label>
-                <select id="targetLang">
-                    <option value="en">Inglês</option>
-                    <option value="pt">Português</option>
-                    <option value="es">Espanhol</option>
-                    <option value="fr">Francês</option>
-                    <option value="de">Alemão</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="buttons">
-            <button id="startBtn">Iniciar Gravação</button>
-            <button id="stopBtn" disabled>Parar</button>
-        </div>
-
-        <div class="output">
-            <h3>Original:</h3>
-            <p id="originalText">—</p>
-
-            <h3>Tradução:</h3>
-            <p id="translatedText">—</p>
-        </div>
+    <h1>🎤 Transcrição de Voz</h1>
+    
+    <button id="recordBtn">🎤 Iniciar Gravação</button>
+    
+    <div>
+        <h3>Texto Reconhecido:</h3>
+        <div id="originalText" class="text-box">-</div>
+    </div>
+    
+    <div>
+        <h3>Tradução:</h3>
+        <div id="translatedText" class="text-box">-</div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        let mediaRecorder;
+        let isRecording = false;
+        let audioChunks = [];
+        let intervalId;
+
+        const recordBtn = document.getElementById("recordBtn");
+        const originalText = document.getElementById("originalText");
+        const translatedText = document.getElementById("translatedText");
+
+        recordBtn.addEventListener("click", async () => {
+            if (!isRecording) {
+                // INICIAR
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+                    
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+                    
+                    mediaRecorder.start(500);
+                    isRecording = true;
+                    
+                    recordBtn.textContent = "⏹️ Parar";
+                    recordBtn.classList.add("recording");
+                    originalText.textContent = "Ouvindo...";
+                    translatedText.textContent = "-";
+                    
+                    intervalId = setInterval(sendAudio, 1000);
+                    
+                } catch (error) {
+                    alert("Erro ao acessar microfone: " + error.message);
+                }
+            } else {
+                // PARAR
+                isRecording = false;
+                clearInterval(intervalId);
+                
+                if (mediaRecorder && mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                }
+                if (mediaRecorder && mediaRecorder.stream) {
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                }
+                
+                recordBtn.textContent = "🎤 Iniciar";
+                recordBtn.classList.remove("recording");
+            }
+        });
+
+        async function sendAudio() {
+            if (!isRecording || audioChunks.length === 0) return;
+            
+            const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+            audioChunks = [];
+            
+            try {
+                const formData = new FormData();
+                formData.append("audio", audioBlob);
+                
+                console.log("📤 Enviando áudio...");
+                
+                const response = await fetch("/stream", {
+                    method: "POST",
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log("✅ Recebido:", result);
+                
+                if (result.original && result.original.trim()) {
+                    originalText.textContent = result.original;
+                }
+                if (result.translated && result.translated.trim()) {
+                    translatedText.textContent = result.translated;
+                }
+                
+            } catch (error) {
+                console.error("❌ Erro:", error);
+            }
+        }
+    </script>
 </body>
 </html>
- 
