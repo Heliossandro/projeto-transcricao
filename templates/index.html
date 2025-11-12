@@ -1,11 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <title>Tradução de Voz com Avatar</title>
 </head>
 <body>
-    <h1>Hello word</h1>
+    <div class="container">
+        <div class="speech">
+            <div class="header">
+                <p>🎤 Tradutor de Voz Inteligente</p>
+                <button id="btnModoEscuro" class="modo-escuro-btn">🌙</button>
+            </div>
+            
+            <div class="language-selector">
+                <label for="sourceLang">Estou falando em:</label>
+                <select id="sourceLang">
+                    <option value="pt-BR">Português (Brasil)</option>
+                    <option value="en-US">Inglês (EUA)</option>
+                    <option value="es-ES">Espanhol</option>
+                    <option value="fr-FR">Francês</option>
+                    <option value="de-DE">Alemão</option>
+                    <option value="it-IT">Italiano</option>
+                    <option value="ja-JP">Japonês</option>
+                </select>
+                
+                <label for="targetLang">Traduzir para:</label>
+                <select id="targetLang">
+                    <option value="en">Inglês</option>
+                    <option value="es">Espanhol</option>
+                    <option value="fr">Francês</option>
+                    <option value="de">Alemão</option>
+                    <option value="it">Italiano</option>
+                    <option value="ja">Japonês</option>
+                    <option value="pt">Português</option>
+                    <option value="ru">Russo</option>
+                    <option value="zh-CN">Chinês</option>
+                    <option value="ko">Coreano</option>
+                    <option value="ar">Árabe</option>
+                </select>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="text-container">
+                    <label>Tradução em Tempo Real:</label>
+                    <textarea id="translatedText" readonly placeholder="A tradução aparecerá aqui enquanto você fala..."></textarea>
+                    
+                    <div class="buttons">
+                        <button id="btnGravar"><i>🎤 Iniciar Tradução</i></button>
+                        <button id="btnParar" disabled><i>⏹️ Parar</i></button>
+                        <button id="btnLimpar"><i>🗑️ Limpar</i></button>
+                        <button id="btnBaixar"><i>📄 Baixar PDF</i></button>
+                    </div>
+                </div>
+
+                <div class="avatar-container">
+                    <div class="avatar">
+                        <div class="avatar-face">
+                            <div class="avatar-eyes">
+                                <div class="eye left-eye"></div>
+                                <div class="eye right-eye"></div>
+                            </div>
+                            <div class="avatar-mouth"></div>
+                        </div>
+                    </div>
+                    <div class="avatar-controls">
+                        <button id="btnFalar"><i>🔊 Falar Tradução</i></button>
+                        <button id="btnPararFala"><i>🔇 Parar Fala</i></button>
+                        <div class="speed-control">
+                            <label for="speed">Velocidade da Voz:</label>
+                            <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
+                            <span id="speedValue">Normal</span>
+                        </div>
+                    </div>
+                    <div class="status">
+                        <div id="statusIndicator" class="status-indicator">Pronto</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incluir a biblioteca jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+   
+    <script src="../static/speech.js"></script>
 </body>
 </html>
